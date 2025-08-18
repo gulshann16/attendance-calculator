@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Calculator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url('bg.jpeg') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 15px;
+    }
+
+    .container {
+      background: rgba(20, 20, 20, 0.85);
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      color: #eee;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #f5f5f5;
+      font-size: 1.6rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    input {
+      width: 90%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #555;
+      border-radius: 8px;
+      font-size: 1rem;
+      background: #2c2c2c;
+      color: #f5f5f5;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    input:focus {
+      border-color: #888;
+      background: #333;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 12px;
+      width: 100%;
+      background: linear-gradient(135deg, #444, #111);
+      border: none;
+      color: #f5f5f5;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background: linear-gradient(135deg, #666, #222);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    }
+
+    .result {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 1rem;
+      white-space: pre-line;
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* ✅ Dynamic result colors */
+    .success {
+      color: #4CAF50;
+    }
+    .error {
+      color: #FF5252;
+    }
+
+    /* 📱 Mobile responsive */
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px;
+      }
+      h2 {
+        font-size: 1.4rem;
+      }
+      input, button {
+        font-size: 0.95rem;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📊 Attendance Calculator</h2>
+    <input type="number" id="attended" placeholder="Classes Attended">
+    <input type="number" id="total" placeholder="Total Classes Held">
+    <button onclick="calculate()">Calculate</button>
+    <div class="result" id="output"></div>
+  </div>
+
+  <script>
+    function calculate() {
+      let A = parseInt(document.getElementById("attended").value);
+      let T = parseInt(document.getElementById("total").value);
+      let p = 0.8; // fixed at 80%
+
+      let output = document.getElementById("output");
+      output.className = "result"; // reset classes
+
+      if (isNaN(A) || isNaN(T) || T <= 0) {
+        output.innerText = "⚠ Please enter valid numbers.";
+        output.classList.add("error");
+        return;
+      }
+
+      let currentPercent = ((A / T) * 100).toFixed(2);
+      let maxMiss = Math.floor((A / p) - T);
+
+      if (maxMiss < 0) {
+        let mustAttend = Math.ceil(((p * T) - A) / (1 - p));
+        output.innerText =
+          `❌ Current Attendance = ${currentPercent}%\nYou are below 80%.\nYou must attend at least ${mustAttend} more class(es) in a row.`;
+        output.classList.add("error");
+      } else {
+        output.innerText =
+          `✅ Current Attendance = ${currentPercent}%\nYou can still miss up to ${maxMiss} more classes and stay above 80%.`;
+        output.classList.add("success");
+      }
+    }
+  </script>
+</body>
+</html>
