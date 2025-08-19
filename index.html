@@ -4,12 +4,73 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Attendance Calculator</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
 
-  <div class="bg-white rounded-3xl shadow-xl overflow-hidden w-full max-w-5xl grid grid-cols-1 md:grid-cols-2">
+  <!-- 1) Make sure Tailwind sees dark-mode via class -->
+  <script>
+    // Create the global before loading Tailwind (bulletproof for CDN)
+    window.tailwind = window.tailwind || {};
+    window.tailwind.config = { darkMode: 'class' };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- 2) Apply saved/system theme ASAP to avoid flash -->
+  <script>
+    (function () {
+      try {
+        const saved = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const useDark = saved ? saved === 'dark' : prefersDark;
+        if (useDark) document.documentElement.classList.add('dark');
+      } catch (_) {}
+    })();
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- Google Analytics-->
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DRVW0L87F3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-DRVW0L87F3');
+</script>
+<!-- End Google Analytics -->
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-950 flex items-center justify-center min-h-screen p-4 transition-colors duration-300">
+
+  <!-- Theme Dropdown -->
+  <div class="absolute top-4 right-4">
+    <div class="relative inline-block text-left">
+      <button id="themeDropdownBtn" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg shadow hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+        🌗 Theme
+      </button>
+      <div id="themeMenu" class="hidden absolute right-0 mt-2 w-44 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-10">
+        <button data-theme="light" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">☀ Light</button>
+        <button data-theme="dark"  class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">🌙 Dark</button>
+        <button data-theme="auto"  class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">🖥 Auto</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="bg-white dark:bg-gray-900 rounded-3xl shadow-xl overflow-hidden w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 transition-colors duration-300">
 
     <!-- Left Panel -->
     <div class="bg-gradient-to-br from-orange-400 to-orange-600 p-6 md:p-10 flex flex-col justify-center text-white text-center md:text-left">
@@ -17,86 +78,142 @@
       <p class="text-base md:text-lg opacity-90">Easily calculate your attendance percentage and know how many classes you can miss or must attend.</p>
     </div>
 
-    <!-- Right Panel (Calculator Form) -->
+    <!-- Right Panel -->
     <div class="p-6 md:p-12 flex flex-col justify-center">
-      <h2 class="text-xl md:text-2xl font-bold text-gray-800 text-center mb-6">Attendance Calculator</h2>
+      <h2 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-200 text-center mb-6">Attendance Calculator</h2>
       
       <form id="attendanceForm" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-600">Classes Attended</label>
-          <input type="number" id="attended" placeholder="Enter attended classes" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm md:text-base">
+          <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Classes Attended</label>
+          <input type="number" id="attended" placeholder="Enter attended classes" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm md:text-base dark:bg-gray-800 dark:border-gray-600 dark:text-white">
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-600">Total Classes</label>
-          <input type="number" id="total" placeholder="Enter total classes" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm md:text-base">
+          <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Total Classes</label>
+          <input type="number" id="total" placeholder="Enter total classes" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm md:text-base dark:bg-gray-800 dark:border-gray-600 dark:text-white">
         </div>
 
         <button type="submit" class="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition text-sm md:text-base">Check Attendance</button>
       </form>
 
       <!-- Result -->
-      <div id="output" class="mt-6 text-center text-sm md:text-lg font-medium text-gray-700 whitespace-pre-line hidden"></div>
+      <div id="output" class="mt-6 text-center text-sm md:text-lg font-medium text-gray-700 dark:text-gray-200 whitespace-pre-line hidden"></div>
 
       <!-- Extra Buttons -->
       <div class="mt-6 space-y-3">
-        <button id="shareBtn" class="w-full py-3 border rounded-lg text-gray-600 hover:bg-gray-50 transition text-sm md:text-base">📘 Share Result</button>
+        <button id="shareBtn" class="w-full py-3 border rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition text-sm md:text-base">📘 Share Result</button>
       </div>
 
-      <!-- Developer Credit -->
-      <p class="text-center text-xs text-gray-400 mt-6">Developed by <span class="font-semibold">Gulshan Sharma</span></p>
+      <!-- Credit -->
+      <p class="text-center text-xs text-gray-400 dark:text-gray-500 mt-6">Developed by <span class="font-semibold">Gulshan Sharma</span></p>
     </div>
   </div>
 
   <script>
-    let lastResult = ""; // store result text
+  let lastResult = "";
 
-    document.getElementById("attendanceForm").addEventListener("submit", function(e){
-      e.preventDefault();
+  // Attendance calc
+  document.getElementById("attendanceForm").addEventListener("submit", function(e){
+    e.preventDefault();
 
-      let A = parseInt(document.getElementById("attended").value);
-      let T = parseInt(document.getElementById("total").value);
-      let p = 0.8; // 80%
-      let output = document.getElementById("output");
+    const A = parseInt(document.getElementById("attended").value, 10);
+    const T = parseInt(document.getElementById("total").value, 10);
+    const p = 0.8; // 80%
+    const output = document.getElementById("output");
 
-      if (isNaN(A) || isNaN(T) || T <= 0) {
-        lastResult = "⚠ Please enter valid numbers.";
-        output.innerText = lastResult;
-        output.classList.remove("hidden");
-        return;
-      }
-
-      let currentPercent = ((A / T) * 100).toFixed(2);
-      let maxMiss = Math.floor((A / p) - T);
-
-      if (maxMiss < 0) {
-        let mustAttend = Math.ceil(((p * T) - A) / (1 - p));
-        lastResult = `❌ Current attendance: ${currentPercent}%\n👉 You must attend at least ${mustAttend} more classes to reach 80%.`;
-      } else {
-        lastResult = `✅ Current attendance: ${currentPercent}%\n🎯 You can still miss ${maxMiss} classes and stay above 80%.`;
-      }
-      
+    if (isNaN(A) || isNaN(T) || T <= 0 || A < 0 || A > T) {
+      lastResult = "⚠ Please enter valid numbers. (A must be between 0 and T)";
       output.innerText = lastResult;
       output.classList.remove("hidden");
-    });
+      return;
+    }
 
-    // Share Button
-    document.getElementById("shareBtn").addEventListener("click", function(){
-      if (!lastResult) {
-        alert("⚠ Please calculate attendance first.");
-        return;
-      }
-      if (navigator.share) {
-        navigator.share({
-          title: "Attendance Report",
-          text: lastResult
-        }).catch(err => console.log("Share cancelled", err));
+    const currentPercent = ((A / T) * 100).toFixed(2);
+    const maxMiss = Math.floor((A / p) - T);
+
+    if (maxMiss < 0) {
+      const mustAttend = Math.ceil(((p * T) - A) / (1 - p));
+      lastResult = `❌ Current attendance: ${currentPercent}%\n👉 You must attend at least ${mustAttend} more classes to reach 80%.`;
+    } else {
+      lastResult = `✅ Current attendance: ${currentPercent}%\n🎯 You can still miss ${maxMiss} classes and stay above 80%.`;
+    }
+    
+    output.innerText = lastResult;
+    output.classList.remove("hidden");
+  });
+
+  // Share
+  document.getElementById("shareBtn").addEventListener("click", function(){
+    if (!lastResult) {
+      alert("⚠ Please calculate attendance first.");
+      return;
+    }
+    if (navigator.share) {
+      navigator.share({ title: "Attendance Report", text: lastResult })
+        .catch(() => {});
+    } else {
+      navigator.clipboard.writeText(lastResult);
+      alert("📋 Result copied to clipboard!");
+    }
+  });
+
+  // Theme dropdown
+  const themeBtn  = document.getElementById("themeDropdownBtn");
+  const themeMenu = document.getElementById("themeMenu");
+
+  themeBtn.addEventListener("click", () => {
+    themeMenu.classList.toggle("hidden");
+  });
+
+  // Apply saved theme on load (ensures localStorage wins over system after boot)
+  (function enforceSavedTheme() {
+    const saved = localStorage.getItem("theme");
+    if (saved === "dark") {
+      document.documentElement.classList.add("dark");
+    } else if (saved === "light") {
+      document.documentElement.classList.remove("dark");
+    } else {
+      // Auto mode: follow system
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.classList.toggle("dark", prefersDark);
+    }
+  })();
+
+  // Handle selection
+  document.querySelectorAll("#themeMenu button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const choice = btn.getAttribute("data-theme");
+
+      if (choice === "dark") {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+      } else if (choice === "light") {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
       } else {
-        navigator.clipboard.writeText(lastResult);
-        alert("📋 Result copied to clipboard!");
+        localStorage.removeItem("theme"); // auto mode
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.classList.toggle("dark", prefersDark);
       }
+
+      themeMenu.classList.add("hidden");
     });
-  </script>
+  });
+
+  // Close dropdown on outside click
+  document.addEventListener("click", (e) => {
+    if (!themeBtn.contains(e.target) && !themeMenu.contains(e.target)) {
+      themeMenu.classList.add("hidden");
+    }
+  });
+
+  // React to system theme changes when in Auto mode
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (!localStorage.getItem('theme')) {
+      document.documentElement.classList.toggle('dark', e.matches);
+    }
+  });
+</script>
 
 </body>
 </html>
